@@ -1,6 +1,6 @@
 <template>
   <main class="flex h-screen items-center justify-center bg-gray-100">
-    <!-- quiz container -->
+    <QuizCompleteOverlay v-if="endQuiz"></QuizCompleteOverlay>
 
     <div class="overflow-hidden bg-white flex-none container relative shadow-lg rounded-lg px-12 py-6">
       <img src="@/assets/images/abstract.svg" alt="" lass="absolute -top-10 left-0 object-none"/>
@@ -56,11 +56,14 @@
 
 <script>
 import { onMounted, ref } from "vue";
+import QuizCompleteOverlay from "../components/QuizCompleteOverlay.vue";
+
 export default {
   setup() {
     let canClick = true;
     let timer = ref(100);
     let score = ref(0);
+    let endQuiz = ref(false);
     let questionCounter = ref(0);
 
     const currentQuestion = ref({
@@ -77,7 +80,7 @@ export default {
       },
       {
         question: "After going out what should you do?",
-        answer: 2,
+        answer: 1,
         choices: ["Wash your hand soap and water, or an alcohol","Just ignore it", "I dont need to wash"],
       }
     ];
@@ -85,11 +88,12 @@ export default {
     const loadQuestion = () => {    
       canClick = true;  
       if(questions.length > questionCounter.value) {
+        timer.value = 100;
         currentQuestion.value = questions[questionCounter.value];
         questionCounter.value++;
         console.log(currentQuestion);
       } else {
-        console.log('out of question');
+        endQuiz.value = true;
       }
     };
 
@@ -122,6 +126,7 @@ export default {
           divContainer.classList.remove("option-default");
         }      
 
+        timer.value = 100;
         canClick = false;
         clearSelected(divContainer);
       } else {
@@ -145,7 +150,10 @@ export default {
       countDownTimer();
     });
 
-    return { score, timer, currentQuestion, questions, questionCounter, loadQuestion, onOptionClicked, optionChosen, countDownTimer};
+    return { score, timer, currentQuestion, questions, questionCounter, loadQuestion, onOptionClicked, optionChosen, countDownTimer, endQuiz};
+  },
+  components: {
+    QuizCompleteOverlay
   },
   methods: {
     // IDK for future cleanup
