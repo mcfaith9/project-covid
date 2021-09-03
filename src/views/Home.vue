@@ -8,7 +8,7 @@
       <div class="relative z-20">
         <div class="text-right text-gray-800">
           <p class="text-sm leading-3">Score</p>
-          <p class="font-bold">60</p>
+          <p class="font-bold">{{ score }}</p>
         </div>
 
         <div class="bg-white shadow-lg p-1 rounded-full w-full h-5 mt-4">
@@ -37,7 +37,7 @@
 
         <div class="mt-8 text-center">
           <div class="h-1 w-12 bg-gray-800 rounded-full mx-auto"></div>
-          <p class="font-bold text-gray-800">2/10</p>
+          <p class="font-bold text-gray-800">{{ questionCounter }}/{{ questions.length }}</p>
         </div>
       </div>
     </div>
@@ -58,6 +58,8 @@
 import { ref } from "vue";
 export default {
   setup() {
+    let canClick = true;
+    let score = ref(0);
     let questionCounter = ref(0);
     const currentQuestion = ref({
       question: "",
@@ -78,7 +80,8 @@ export default {
       }
     ];
 
-    const loadQuestion = () => {      
+    const loadQuestion = () => {    
+      canClick = true;  
       if(questions.length > questionCounter.value) {
         currentQuestion.value = questions[questionCounter.value];
         questionCounter.value++;
@@ -105,20 +108,26 @@ export default {
     };
 
     const onOptionClicked = (choice, item) => {
-      const divContainer = itemsRef[item];
-      const optionID = item + 1;
-      if(currentQuestion.value.answer == optionID) {
-        divContainer.classList.add("option-correct");
-        divContainer.classList.remove("option-default");
-      } else {
-        divContainer.classList.add("option-wrong");
-        divContainer.classList.remove("option-default");
-      }      
+      if(canClick) {
+        const divContainer = itemsRef[item];
+        const optionID = item + 1;
+        if(currentQuestion.value.answer == optionID) {
+          score.value += 10;
+          divContainer.classList.add("option-correct");
+          divContainer.classList.remove("option-default");
+        } else {
+          divContainer.classList.add("option-wrong");
+          divContainer.classList.remove("option-default");
+        }      
 
-      clearSelected(divContainer);
+        canClick = false;
+        clearSelected(divContainer);
+      } else {
+        console.log("cant click");
+      }     
     };
 
-    return { currentQuestion, questions, questionCounter, loadQuestion, onOptionClicked, optionChosen};
+    return { score, currentQuestion, questions, questionCounter, loadQuestion, onOptionClicked, optionChosen};
   },
   methods: {
 
