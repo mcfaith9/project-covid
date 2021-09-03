@@ -12,7 +12,7 @@
         </div>
 
         <div class="bg-white shadow-lg p-1 rounded-full w-full h-5 mt-4">
-          <div class="bg-blue-700 rounded-full w-11/12 h-full"></div>
+          <div class="bg-blue-700 rounded-full w-11/12 h-full" :style="`width:${timer}%`"></div>
         </div>
 
         <div class="rounded-lg bg-gray-100 p-2 neumorph-1 text-center font-bold text-gray-800 mt-8">
@@ -55,12 +55,14 @@
 </style>
 
 <script>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 export default {
   setup() {
     let canClick = true;
+    let timer = ref(100);
     let score = ref(0);
     let questionCounter = ref(0);
+
     const currentQuestion = ref({
       question: "",
       answer: 1,
@@ -127,13 +129,29 @@ export default {
       }     
     };
 
-    return { score, currentQuestion, questions, questionCounter, loadQuestion, onOptionClicked, optionChosen};
+    const countDownTimer = function() {
+      let interval = setInterval(() => {
+        if(timer.value > 0) {
+          timer.value--;
+        } else {
+          console.log('times up');
+          clearInterval(interval);
+        }        
+      }, 150);
+    }
+
+    onMounted(() => {
+      loadQuestion();
+      countDownTimer();
+    });
+
+    return { score, timer, currentQuestion, questions, questionCounter, loadQuestion, onOptionClicked, optionChosen, countDownTimer};
   },
   methods: {
-
+    // IDK for future cleanup
   },
   mounted() {
-    this.loadQuestion();
+    // IDK for future cleanup
   }
 };
 </script> 
