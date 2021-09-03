@@ -5,20 +5,16 @@
     <div class="overflow-hidden bg-white flex-none container relative shadow-lg rounded-lg px-12 py-6">
       <img src="@/assets/images/abstract.svg" alt="" lass="absolute -top-10 left-0 object-none"/>
 
-      <!-- contents -->
       <div class="relative z-20">
-        <!-- score container -->
         <div class="text-right text-gray-800">
           <p class="text-sm leading-3">Score</p>
           <p class="font-bold">60</p>
         </div>
 
-        <!-- timer container -->
         <div class="bg-white shadow-lg p-1 rounded-full w-full h-5 mt-4">
           <div class="bg-blue-700 rounded-full w-11/12 h-full"></div>
         </div>
 
-        <!-- question container -->
         <div class="rounded-lg bg-gray-100 p-2 neumorph-1 text-center font-bold text-gray-800 mt-8">
           <div class="bg-white p-5">
             {{ currentQuestion.question }}
@@ -39,7 +35,6 @@
           </div>
         </div>
 
-        <!-- progress indicator container -->
         <div class="mt-8 text-center">
           <div class="h-1 w-12 bg-gray-800 rounded-full mx-auto"></div>
           <p class="font-bold text-gray-800">2/10</p>
@@ -83,8 +78,14 @@ export default {
       }
     ];
 
-    const onQuizStart = () => {
-      currentQuestion.value = questions[questionCounter.value];
+    const loadQuestion = () => {      
+      if(questions.length > questionCounter.value) {
+        currentQuestion.value = questions[questionCounter.value];
+        questionCounter.value++;
+        console.log(currentQuestion);
+      } else {
+        console.log('out of question');
+      }
     };
 
     let itemsRef = [];
@@ -92,6 +93,15 @@ export default {
       if(element) {
         itemsRef.push(element);
       }
+    };
+
+    const clearSelected = (divSelected) => {
+      setTimeout(() =>{
+        divSelected.classList.remove("option-correct");
+        divSelected.classList.remove("option-wrong");
+        divSelected.classList.add("option-default");
+        loadQuestion();
+      }, 1000);      
     };
 
     const onOptionClicked = (choice, item) => {
@@ -104,14 +114,17 @@ export default {
         divContainer.classList.add("option-wrong");
         divContainer.classList.remove("option-default");
       }      
+
+      clearSelected(divContainer);
     };
 
-    return { currentQuestion, questions, questionCounter, onQuizStart, onOptionClicked, optionChosen};
+    return { currentQuestion, questions, questionCounter, loadQuestion, onOptionClicked, optionChosen};
   },
   methods: {
+
   },
   mounted() {
-    this.onQuizStart();
+    this.loadQuestion();
   }
 };
 </script> 
